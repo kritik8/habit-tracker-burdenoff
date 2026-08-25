@@ -17,13 +17,17 @@ export const metadata: Metadata = {
   description: "A full-stack, timezone-aware habit tracker focused on calendar-day streaks.",
 };
 
+import { ToastProvider } from "@/components/ui/toast";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }
