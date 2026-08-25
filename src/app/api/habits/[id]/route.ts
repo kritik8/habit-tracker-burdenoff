@@ -49,9 +49,17 @@ export async function GET(_request: Request, { params }: Params) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const url = new URL(_request.url)
+    const page = parseInt(url.searchParams.get('page') || '1', 10)
+    const limit = parseInt(url.searchParams.get('limit') || '5', 10)
+    const skip = (page - 1) * limit
+
     const dates = habit.checkIns.map((ci) => ci.localDate)
     const todayLocalDate = getLocalCalendarDate(new Date(), user.timezone)
     const streaks = calculateStreaks(dates, todayLocalDate)
+
+    const totalCheckIns = habit.checkIns.length
+    const paginatedCheckIns = habit.checkIns.slice(skip, skip + limit)
 
     return NextResponse.json({
       habit: {
@@ -60,10 +68,16 @@ export async function GET(_request: Request, { params }: Params) {
         description: habit.description,
         createdAt: habit.createdAt,
         updatedAt: habit.updatedAt,
-        checkIns: habit.checkIns,
-        checkInsCount: dates.length,
+        checkIns: paginatedCheckIns,
+        checkInsCount: totalCheckIns,
+        allCheckInDates: dates,
         isCompletedToday: dates.includes(todayLocalDate),
         ...streaks,
+        pagination: {
+          page,
+          pageSize: limit,
+          total: totalCheckIns,
+        },
       },
     })
   } catch (error) {

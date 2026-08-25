@@ -15,8 +15,14 @@ import { HabitData } from '@/components/habits/HabitCard'
 
 interface HabitDetail extends HabitData {
   checkIns: { id: string; localDate: string; checkedInAtUtc: string }[]
+  allCheckInDates: string[]
   isCompletedToday: boolean
   createdAt: string
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+  }
 }
 
 export default function HabitDetailPage() {
@@ -25,6 +31,7 @@ export default function HabitDetailPage() {
   const { toast } = useToast()
   const [habit, setHabit] = useState<HabitDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -32,7 +39,7 @@ export default function HabitDetailPage() {
 
   const fetchHabit = useCallback(async () => {
     try {
-      const res = await fetch(`/api/habits/${id}`)
+      const res = await fetch(`/api/habits/${id}?page=${page}&limit=5`)
       if (!res.ok) {
         if (res.status === 404) throw new Error('Habit not found')
         if (res.status === 403) throw new Error('Access forbidden')
@@ -47,7 +54,7 @@ export default function HabitDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [id, router, toast])
+  }, [id, page, router, toast])
 
   useEffect(() => {
     fetchHabit()
@@ -108,7 +115,7 @@ export default function HabitDetailPage() {
 
   if (!habit) return null
 
-  const checkInDatesList = habit.checkIns.map((c) => c.localDate)
+  const checkInDatesList = habit.allCheckInDates
   const isCompletedToday = habit.isCompletedToday
 
   return (
@@ -219,6 +226,29 @@ export default function HabitDetailPage() {
                     </button>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {habit.pagination && habit.pagination.total > habit.pagination.pageSize && (
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-[10px] font-semibold text-zinc-500 select-none">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {habit.pagination.page} of {Math.ceil(habit.pagination.total / habit.pagination.pageSize)}
+                </span>
+                <button
+                  disabled={page >= Math.ceil(habit.pagination.total / habit.pagination.pageSize)}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                >
+                  Next
+                </button>
               </div>
             )}
           </div>
