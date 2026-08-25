@@ -156,3 +156,12 @@ Configured in [`.github/workflows/ci.yml`](file:///c:/Users/Kratik/IIIT%20Academ
 ## Tradeoffs
 - **Mock-based tests**: Eliminates integration test requirements for active local docker daemons during test runs, but relies on mocking the database layer. Verified via production database seeds.
 - **In-memory slice pagination**: Simple and efficient for typical habit logs (~hundreds of records), but would need database-level pagination if check-ins scaled to thousands.
+
+## Submission
+
+### Live Demo
+_To be added after deployment._
+
+### Walkthrough
+_To be added after the implementation walkthrough is recorded._
+
