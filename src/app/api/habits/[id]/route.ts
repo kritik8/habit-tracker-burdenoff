@@ -62,6 +62,7 @@ export async function GET(_request: Request, { params }: Params) {
         updatedAt: habit.updatedAt,
         checkIns: habit.checkIns,
         checkInsCount: dates.length,
+        isCompletedToday: dates.includes(todayLocalDate),
         ...streaks,
       },
     })
